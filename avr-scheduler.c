@@ -12,6 +12,7 @@ event_t event_t_error = {
 	.ms_time = 65535,
 	.id = 255,
 	.next = NULL,
+	.previous = NULL,
 };
 
 /* Creates an event_t in memory, and returns its pointer. */
@@ -48,13 +49,19 @@ schedule_t* new_schedule() {
 uint8_t schedule_clear(schedule_t *s) {
 	if (s == NULL) {
 		return SCHEDULE_NOT_FOUND; // return empty if it's not found
+	} else if (schedule_is_empty(s)) {
+		return 0;
 	}
 	event_t *temp = s->last_event;
 	while(temp != NULL) {
 		temp = s->last_event->previous;
 		free(s->last_event);
 		s->last_event = temp;
+		if (s->last_event != NULL) {
+			s->last_event->next = NULL;
+		}
 		s->size--;
+		
 	}
 	return 0;
 }
@@ -172,6 +179,9 @@ event_t schedule_pop(schedule_t *s) {
 	event_t *temp = s->last_event->previous;
 	free(s->last_event);
 	s->last_event = temp;
+	if (s->last_event != NULL) {
+		s->last_event->next = NULL;
+	}
 	s->size--;
 	return ret;
 }
