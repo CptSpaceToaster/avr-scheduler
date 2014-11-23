@@ -44,6 +44,21 @@ schedule_t* new_schedule() {
 	return ret;
 }
 
+/* Empties the given schedule */
+uint8_t schedule_clear(schedule_t *s) {
+	if (s == NULL) {
+		return SCHEDULE_NOT_FOUND; // return empty if it's not found
+	}
+	event_t *temp = s->last_event;
+	while(temp != NULL) {
+		temp = s->last_event->previous;
+		free(s->last_event);
+		s->last_event = temp;
+		s->size--;
+	}
+	return 0;
+}
+
 /* Checks the count, and returns true if the count is zero */
 bool schedule_is_empty(schedule_t *s) {
 	if (s == NULL) {

@@ -39,7 +39,10 @@ typedef struct {
 event_t* new_event(uint16_t duration, uint16_t current_time, uint8_t new_id);
 
 /* Creates a schedule_t in memory, and returns its pointer.  Sets the first and last element to NULL nodes, and size value to zero. */
-schedule_t* new_schedule();
+schedule_t* new_schedule(void);
+
+/* Empties the given schedule */
+uint8_t schedule_clear(schedule_t *s);
 
 /* Checks the count, and returns true if the count is zero */
 bool schedule_is_empty(schedule_t *s);
