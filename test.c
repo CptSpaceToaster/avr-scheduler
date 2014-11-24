@@ -102,4 +102,52 @@ int main(int argc, char *argv[]) {
 	schedule_test_backwards(s);
 	schedule_test_forwards(s);
 	schedule_clear(s);
+	
+	
+	
+	
+	schedule_insert(s, 20, 59850, 0);
+	schedule_insert(s, 50, 59850, 0);
+	schedule_insert(s, 100, 59850, 1);
+	schedule_insert(s, 100, 50, 2);
+	schedule_insert(s, 100, 150, 3);
+	schedule_insert(s, 100, 150, 4);
+	schedule_pop(s);
+	schedule_pop(s);
+	schedule_test_backwards(s);
+	schedule_test_forwards(s);
+	schedule_clear(s);
+	
+	schedule_insert(s, 20, 59950, 0);
+	schedule_insert(s, 50, 59950, 0);
+	schedule_insert(s, 100, 59950, 1);
+	schedule_insert(s, 100, 50, 2);
+	schedule_insert(s, 100, 150, 3);
+	schedule_insert(s, 100, 150, 4);
+	schedule_pop(s);
+	schedule_pop(s);
+	schedule_test_backwards(s);
+	schedule_test_forwards(s);
+	schedule_clear(s);
+	
+	schedule_insert(s, 150, 59950, 1); //100
+	schedule_insert(s, 50, 	59960, 0);  //10
+	schedule_insert(s, 100, 59970, 0); //70
+	schedule_pop(s);
+	schedule_pop(s);
+	schedule_test_backwards(s);
+	schedule_test_forwards(s);
+	schedule_clear(s);
+	
+	schedule_insert(s, 150, 59950, 3); //100
+	schedule_insert(s, 50, 59960, 0);  //10
+	schedule_insert(s, 100, 59970, 1); //70
+	schedule_insert(s, 60, 30, 2);     //90
+	schedule_insert(s, 10, 50, 0);     //60
+	schedule_insert(s, 100, 150, 4);   //250
+	schedule_pop(s);
+	schedule_pop(s);
+	schedule_test_backwards(s);
+	schedule_test_forwards(s);
+	schedule_clear(s);
 }

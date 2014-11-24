@@ -210,7 +210,9 @@ event_t schedule_peek(schedule_t *s) {
 }
 
 /* Used to check the schedule, and consumes and returns an event if it's ready, or the empty_event if nothing is scheduled.
- * Be prepared for the empty event... your code better be ready to be handed an empty_event */
+ * Be prepared for the empty event... your code better be ready to be handed an empty_event 
+ *
+ * This appears to be slipping null pointers in the schedule somehow... don't use for now */
 event_t schedule_check(schedule_t *s, uint16_t current_time) {
 	if (s == NULL) {
 		return event_t_error; // SCHEDULE_NOT_FOUND
