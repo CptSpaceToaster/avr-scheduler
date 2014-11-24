@@ -15,13 +15,21 @@ event_t event_t_error = {
 	.previous = NULL,
 };
 
+event_t event_t_empty = {
+	.ms_duration = 0,
+	.ms_time = 0,
+	.id = 0,
+	.next = NULL,
+	.previous = NULL,
+};
+
 /* Creates an event_t in memory, and returns its pointer. */
 event_t* new_event(uint16_t new_duration, uint16_t current_time, uint8_t new_id) {
 	event_t *ret = (event_t *)malloc(sizeof(event_t));
 	if (ret == NULL) {
 		//Didn't get anything from malloc... most likely out of memory
 		return NULL;
-	} if (new_duration > 65535 - SCHEDULE_TIME_CEILING) {
+	} if (new_duration > 65535-SCHEDULE_TIME_CEILING-SCHEDULE_THRESHOLD) {
 		return NULL;
 	}
 	ret->ms_duration = new_duration;
@@ -115,7 +123,7 @@ uint8_t schedule_insert(schedule_t *s, uint16_t duration, uint16_t current_time,
 		return SCHEDULE_NOT_FOUND;
 	} else if (s->size >= SCHEDULE_SIZE) {
 		return SCHEDULE_OVERFLOW;
-	} if (duration > 65535-SCHEDULE_TIME_CEILING) {
+	} if (duration > 65535-SCHEDULE_TIME_CEILING-SCHEDULE_THRESHOLD) {
 		return DURATION_TOO_LONG;
 	}
 	
@@ -129,7 +137,9 @@ uint8_t schedule_insert(schedule_t *s, uint16_t duration, uint16_t current_time,
 		s->first_event = input;
 		s->last_event = input;
 	} else if (s->size == 1) {
-		if ((duration + current_time) >= s->first_event->ms_duration + s->first_event->ms_time) {
+		if ( ((current_time >= s->first_event->ms_time) && (duration + current_time) >= (s->first_event->ms_duration + s->first_event->ms_time)) || 
+		     ((current_time <  s->first_event->ms_time) && (duration + current_time+SCHEDULE_THRESHOLD)%SCHEDULE_TIME_CEILING >= (s->first_event->ms_duration + s->first_event->ms_time+SCHEDULE_THRESHOLD)%SCHEDULE_TIME_CEILING) )
+		{
 			input->next = s->first_event;
 			s->first_event->previous = input;
 			s->first_event = input;
@@ -148,7 +158,9 @@ uint8_t schedule_insert(schedule_t *s, uint16_t duration, uint16_t current_time,
 				s->last_event->next = input;
 				s->last_event = input;
 				break;
-			} else if ((duration + current_time) >= temp->ms_duration + temp->ms_time) {
+			} else if ( ((current_time >= temp->ms_time) && (duration + current_time) >= (temp->ms_duration + temp->ms_time)) ||
+			            ((current_time <  temp->ms_time) && (duration + current_time+SCHEDULE_THRESHOLD)%SCHEDULE_TIME_CEILING >= (temp->ms_duration + temp->ms_time+SCHEDULE_THRESHOLD)%SCHEDULE_TIME_CEILING) )
+			{
 				input->next = temp;	
 			
 				if (temp->previous == NULL) { // temp is the beginning of the list
@@ -195,4 +207,77 @@ event_t schedule_peek(schedule_t *s) {
 		return event_t_error;
 	}
 	return *(s->last_event);
+}
+
+/* Used to check the schedule, and consumes and returns an event if it's ready, or the empty_event if nothing is scheduled.
+ * Be prepared for the empty event... your code better be ready to be handed an empty_event */
+event_t schedule_check(schedule_t *s, uint16_t current_time) {
+	if (s == NULL) {
+		return event_t_error; // SCHEDULE_NOT_FOUND
+	} else if (schedule_is_empty(s)) {
+		return event_t_error;
+	}
+	
+	event_t *next_event = (s->last_event);
+	
+	if (current_time >= next_event->ms_time) {
+		if ((current_time - next_event->ms_time) >= next_event->ms_duration) {
+			return schedule_pop(s);
+		}
+	} else {
+		if ((current_time+SCHEDULE_THRESHOLD) >= ((next_event->ms_time+next_event->ms_duration+SCHEDULE_THRESHOLD)%SCHEDULE_TIME_CEILING)) {
+			return schedule_pop(s);
+		}
+	}
+	
+	return event_t_empty; // Nothing is ready
+}
+
+/* This stuff is for debugging mostly... you shouldn't need this */
+void schedule_walk_forwards(schedule_t *s) {
+	event_t *temp = s->first_event;
+	while (temp != NULL) {
+		printf("%u \t%d \t%d\n", temp->ms_time, temp->ms_duration, temp->id);
+		temp = temp->next;
+	}
+	printf("\n");
+}
+
+void schedule_walk_backwards(schedule_t *s) {
+	event_t *temp = s->last_event;
+	while (temp != NULL) {
+		printf("%u \t%d \t%d\n", temp->ms_time, temp->ms_duration, temp->id);
+		temp = temp->previous;
+	}
+	printf("\n");
+}
+
+void schedule_test_forwards(schedule_t *s) {
+	event_t *temp = s->first_event;
+	uint8_t ctr = s->size;
+	while (temp != NULL) {
+		if (ctr != temp->id) {
+			printf("Failed\n");
+			schedule_walk_forwards(s);
+			return;
+		}
+		ctr--;
+		temp = temp->next;
+	}
+	printf("Passed\n");
+}
+
+void schedule_test_backwards(schedule_t *s) {
+	event_t *temp = s->last_event;
+	uint8_t ctr = 1;
+	while (temp != NULL) {
+		if (ctr != temp->id) {
+			printf("Failed\n");
+			schedule_walk_backwards(s);
+			return;
+		}
+		ctr++;
+		temp = temp->previous;
+	}
+	printf("Passed\n");
 }

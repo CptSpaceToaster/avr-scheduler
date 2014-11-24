@@ -1,0 +1,21 @@
+CC=gcc
+CFLAGS=-I.
+DEPS = avr-scheduler.h
+OBJ = test.o avr-scheduler.o 
+
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+.PHONY: test
+test: $(OBJ)
+	gcc -o $@ $^ $(CFLAGS)
+	$(MAKE) clean_obj
+	
+.PHONY: clean_obj
+clean_obj:
+	rm -f $(OBJ)
+	
+.PHONY: clean
+clean:
+	rm -f $(OBJ)
+	rm -f test.exe

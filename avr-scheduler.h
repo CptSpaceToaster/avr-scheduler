@@ -4,7 +4,7 @@
  * Created: 11/22/2014 2:44:29 PM
  * Author: CaptainSpaceToaster
  *
- * A millisecond resolution scheduler that holds and maintains a FILO-doubly-linked-list of event_t structures inside 
+ * A millisecond resolution scheduler that holds and maintains a FIL	 O-doubly-linked-list of event_t structures inside 
  * of a schedule_t structure.  (very queue like, but the list can prioritize new events)
  * 
  * - Define a schedule_t, and initalize it with a call to new_schedule()
@@ -25,9 +25,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#ifndef FCPU
+#include <stdint.h>
+#endif
 
-#define SCHEDULE_SIZE				50 // Maximum number of stored events
+#define SCHEDULE_SIZE				30 // Maximum number of stored events
 #define SCHEDULE_TIME_CEILING       60000
+#define SCHEDULE_THRESHOLD          1000
 #define GET_EVENT_TIME(EVENT_T)     ((uint16_t)((EVENT_T.ms_duration + EVENT_T.ms_time)%SCHEDULE_TIME_CEILING))
 
 /* Nodes of the doubly-linked-list */
@@ -80,5 +84,15 @@ event_t schedule_pop(schedule_t *s);
 
 /* Peeks at the last element from the schedule and returns it */
 event_t schedule_peek(schedule_t *s);
+
+/* Used to check the schedule, and consumes and returns an event if it's ready, or the empty_event if nothing is scheduled.
+ * Be prepared for the empty event... your code better be ready to be handed an empty_event */
+event_t schedule_check(schedule_t *s, uint16_t current_time);
+
+/* This stuff is for debugging mostly... you shouldn't need this */
+void schedule_walk_forwards(schedule_t *s);
+void schedule_walk_backwards(schedule_t *s);
+void schedule_test_forwards(schedule_t *s);
+void schedule_test_backwards(schedule_t *s);
 
 #endif // _SCHEDULE_H_
