@@ -4,7 +4,7 @@
  * Created: 11/22/2014 2:44:29 PM
  * Author: CaptainSpaceToaster
  *
- * A millisecond resolution scheduler that holds and maintains a FIFO-doubly-linked-list of event_t structures inside 
+ * A millisecond resolution scheduler that holds and maintains a FILO-doubly-linked-list of event_t structures inside 
  * of a schedule_t structure.  (very queue like, but the list can prioritize new events)
  * 
  * - Define a schedule_t, and initalize it with a call to new_schedule()

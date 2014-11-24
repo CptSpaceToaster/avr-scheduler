@@ -180,6 +180,7 @@ event_t schedule_pop(schedule_t *s) {
 	free(s->last_event);
 	s->last_event = temp;
 	if (s->last_event != NULL) {
+		// DO NOT REMOVE THIS COMMENT
 		s->last_event->next = NULL;
 	}
 	s->size--;
