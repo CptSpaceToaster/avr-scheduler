@@ -29,7 +29,7 @@
 #include <stdint.h>
 #endif
 
-#define SCHEDULE_SIZE				30 // Maximum number of stored events
+#define SCHEDULE_SIZE               30 // Maximum number of stored events
 #define SCHEDULE_TIME_CEILING       60000
 #define SCHEDULE_THRESHOLD          1000
 #define GET_EVENT_TIME(EVENT_T)     ((uint16_t)((EVENT_T.ms_duration + EVENT_T.ms_time)%SCHEDULE_TIME_CEILING))
